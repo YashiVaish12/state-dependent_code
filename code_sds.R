@@ -1,24 +1,66 @@
-#function for generate estimates
-#SDD <- function(A, B, C, D) {
- # alapharaset1 <- 200
-#X <-  (((1 - C^A) / (1 - C)) + ((B * C^(A - 1)) / (1 - B)))^-1
-  #Xn <- rep(0, alapharaset1) N <- rep(0, alapharaset1)cc <- 1
-  #for (i in 0:alapharaset1) {if (i < A) {P <- (C^i) * X} else {P <- ((C^(A - 1)) * (B^(i - A + 1))) * X}
-   # Xn[cc] <- PN[cc]  icc <- cc + 1}
-  #Xn <- Xn/sum(Xn);ms <- 50stt <- 0end <- ms
-  #alapharaset <- 500 Alpha_B <- runif(alapharaset,0,1) Alpha_C <- rgamma(alapharaset,1,3) 
-  #while (stt < D) {Ta <- min(end, D) - stt
-#random sample generation
-   # R <- sample(N, Ta, replace = TRUE, prob = Xn) Ve_B <- rep(0, alapharaset) Ve_C <- rep(0, alapharaset)
-    #for (j in 1:alapharaset) {B_j <- Alpha_B[j]for (r in 1:alapharaset) {C_r <- Alpha_C[r] 
-    #X <-  (((1 - C_r^A) / (1 - C_r)) + ((B_j * C_r^(A - 1)) / (1 - B_j)))^-1; E1 <- 1
-        #for (i in 1:Ta) {i1 <- R[i] if (i1 < A) {E1a <- (C_r^i1) * X
-            #E1 <- E1 * E1a} else {E2a <- ((C_r^(A - 1)) * (B_j^(i1 - A + 1))) * XE1 <- E1 * E2a}}
-        #Ve_B[j] <- E1 Ve_C[r] <- E1}} Ve_B <- Ve_B / sum(Ve_B) Ve_C <- Ve_C / sum(Ve_C)
-    #Pt_B <- sample(Alpha_B, alapharaset, replace = TRUE, prob = Ve_B )Pt_C <- sample(Alpha_C, alapharaset, replace = TRUE, prob = Ve_C)
-    #stt <- min(end, D)end <- end + ms Alpha_B <- Pt_B Alpha_C <- Pt_C}
-#bayes estimation
-  #sf <- mean(Pt_B)print(paste("set = ", sf))
-  #sf1 <- mean(Pt_C)print(paste("set1 = ", sf1))}
+#sd <- function(K, r,r1, n) {
+#P0 <- P0 + (((1 - r1^K) / (1 - r1)) + ((r * r1^(K - 1)) / (1 - r)))
+  #ps <- take any positive value for ps...
+  Pn <- rep(0, ps)
+  N <- rep(0, ps)
+  for (i in 0:ps) {
+    if (i < K) {
+      P <- (r1^i) * P0
+    } else {
+      P <- ((r1^(K - 1)) * (r^(i - K + 1))) * P0
+    }
+    #c<- take any initial value for c to store value in matrix form
+    Pn[c] <- P
+    N[c] <- i
+    c <- c + 1
+  }
+  
+  #T<- take any positive value to generate the random sample
+  iter <- 5000 #increase the value of iteration to get more accuracy in the estimated value
+  # for mle use the optimization method 
+  # for Bayesian estimates use different priors
+ # Pr_r <- rbeta(T,1,3) #change the prior according to the condition of the parameter
+#  Pr_r1 <- rgamma(T,1,3)
+  while (init < n) {
+    #R <- sample(N, T, replace = TRUE, prob = Pn) #for random sample generation change the function according to the conditions of density 
+    #V_r <- rep(0, iter)
+    #V_r1 <- rep(0, iter)
+    for (j in 1:T) {
+      r_j <- Pr_r[j]
+      for (r in 1:iter) {
+        r1_r <- Pr_r1[r]
+        #P0 <- P0 + (((1 - r1_r^K) / (1 - r1_r)) + ((r_j * r1_r^(K - 1)) / (1 - r_j)))
+        
+        E1 <- 1
+        for (i in 1:T) {
+          i1 <- R[i]
+          if (i1 < K) {
+            E1a <- (r1_r^i1) * P0
+            E1 <- E1 * E1a
+          } else {
+            E2a <- ((r1_r^(K - 1)) * (r_j^(i1 - K + 1))) * P0
+            E1 <- E1 * E2a
+          }
+        }
+        V_r[j] <- E1
+        V_r1[r] <- E1
+      }
+    }
+    
+    Po_r <- sample(Pr_r, Tasir, replace = TRUE, prob = V_r)
+    Po_r1 <- sample(Pr_r1, Tasir, replace = TRUE, prob = V_r1)
+    
+    Pr_r <- Po_r
+    Pr_r1 <- Po_r1
+  }
+  
+  #for an estimate of r
+  est <- mean(Po_r)
+   #for r1
+  est1 <- mean(Po_r1)
+  # For the the value of square error, risk, confidence, and credible interval generate the formula accordingly for parameters
+  
+  
+}
 
-#SDD(A=3, B=0.7, C=0.5, D=50)
+sd(3,0.3,0.5,50)
